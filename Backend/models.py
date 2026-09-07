@@ -22,6 +22,7 @@ class Team(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(100), nullable=False)
     league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
     league: Mapped["League"] = relationship(back_populates="teams")
     draft_position: Mapped[int] = mapped_column(nullable=False)
