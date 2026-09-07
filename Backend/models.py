@@ -1,12 +1,12 @@
-from sqlalchemy import Column, String, ForeignKey, Table
+from sqlalchemy import CheckConstraint, Column, String, ForeignKey, Table
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from database import Base
 
 player_team_association = Table(
     "player_team",
     Base.metadata,
-    Column("player_id", ForeignKey("player.id"), primary_key=True),
-    Column("team_id", ForeignKey("team.id"), primary_key=True),
+    Column("player_id", ForeignKey("players.id"), primary_key=True),
+    Column("team_id", ForeignKey("teams.id"), primary_key=True),
 )
 
 class League(Base):
@@ -14,7 +14,8 @@ class League(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     drafted: Mapped[bool] = mapped_column(default=False)
-    teams: Mapped[list[Team]] = relationship(back_populates="league")
+    teams: Mapped[list["Team"]] = relationship(back_populates="league")
+    matchups: Mapped[list["Matchup"]] = relationship(back_populates="league")
 
 class Team(Base):
     __tablename__ = "teams"
@@ -22,9 +23,11 @@ class Team(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
-    league: Mapped[League] = relationship(back_populates="teams")
+    league: Mapped["League"] = relationship(back_populates="teams")
     draft_position: Mapped[int] = mapped_column(nullable=False)
-    players: Mapped[list[Player]] = relationship(secondary=player_team_association, back_populates="teams")
+    players: Mapped[list["Player"]] = relationship(secondary=player_team_association, back_populates="teams")
+    home_matchups: Mapped[list["Matchup"]] = relationship(foreign_keys="[Matchup.home_team_id]", back_populates="home_team")
+    away_matchups: Mapped[list["Matchup"]] = relationship(foreign_keys="[Matchup.away_team_id]", back_populates="away_team")
 
 class Player(Base):
     __tablename__ = "players"
@@ -34,4 +37,23 @@ class Player(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     school: Mapped[str] = mapped_column(String(100), nullable=False)
     position: Mapped[str] = mapped_column(String(10), nullable=False)
-    teams: Mapped[list[Team]] = relationship(secondary=player_team_association, back_populates="players")
+    teams: Mapped[list["Team"]] = relationship(secondary=player_team_association, back_populates="players")
+
+class Matchup(Base):
+    __tablename__ = "matchups"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    week: Mapped[int] = mapped_column(nullable=False)
+    home_team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), nullable=False)
+    away_team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), nullable=False)
+    home_team: Mapped["Team"] = relationship(foreign_keys=[home_team_id], back_populates="home_matchups")
+    away_team: Mapped["Team"] = relationship(foreign_keys=[away_team_id], back_populates="away_matchups")
+    league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
+    league: Mapped["League"] = relationship(back_populates="matchups")
+
+    __table_args__ = (
+        CheckConstraint(
+            "home_team_id != away_team_id",
+            name="unique_matchup_teams"
+        ),
+    )
