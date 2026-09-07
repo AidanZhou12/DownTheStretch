@@ -50,6 +50,9 @@ class Matchup(Base):
     away_team: Mapped["Team"] = relationship(foreign_keys=[away_team_id], back_populates="away_matchups")
     league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
     league: Mapped["League"] = relationship(back_populates="matchups")
+    matchup_type: Mapped[str] = mapped_column(String(20), default="regular")
+    home_score: Mapped[float | None] = mapped_column(nullable=True)
+    away_score: Mapped[float | None] = mapped_column(nullable=True)
 
     __table_args__ = (
         CheckConstraint(
