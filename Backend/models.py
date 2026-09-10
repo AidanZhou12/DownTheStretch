@@ -13,7 +13,6 @@ class League(Base):
     __tablename__ = "leagues"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    drafted: Mapped[bool] = mapped_column(default=False)
     teams: Mapped[list["Team"]] = relationship(back_populates="league")
     matchups: Mapped[list["Matchup"]] = relationship(back_populates="league")
 
