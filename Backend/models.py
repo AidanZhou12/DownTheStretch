@@ -13,7 +13,9 @@ class League(Base):
     __tablename__ = "leagues"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     teams: Mapped[list["Team"]] = relationship(back_populates="league")
+    draft: Mapped[list["Draft"]] = relationship(back_populates="league")
     matchups: Mapped[list["Matchup"]] = relationship(back_populates="league")
 
 class Team(Base):
@@ -60,3 +62,12 @@ class Matchup(Base):
             name="unique_matchup_teams"
         ),
     )
+
+class Draft(Base):
+    __tablename__ = "drafts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
+    league: Mapped["League"] = relationship(back_populates="drafts")
+    current_pick: Mapped[int] = mapped_column(nullable=False, default=1)
+    completed: Mapped[bool] = mapped_column(nullable=False, default=False)
