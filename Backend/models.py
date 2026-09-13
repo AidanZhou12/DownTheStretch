@@ -71,4 +71,4 @@ class Draft(Base):
     league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
     league: Mapped["League"] = relationship(back_populates="drafts")
     current_pick: Mapped[int] = mapped_column(nullable=False, default=1)
-    completed: Mapped[bool] = mapped_column(nullable=False, default=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
