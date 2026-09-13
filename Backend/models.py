@@ -17,6 +17,7 @@ class League(Base):
     teams: Mapped[list["Team"]] = relationship(back_populates="league")
     draft: Mapped[list["Draft"]] = relationship(back_populates="league")
     matchups: Mapped[list["Matchup"]] = relationship(back_populates="league")
+    current_week: Mapped[int] = mapped_column(nullable=False, default=1)
 
 class Team(Base):
     __tablename__ = "teams"
