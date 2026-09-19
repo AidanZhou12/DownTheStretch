@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
 import { createLeague, createTeam } from '../api/create';
-import './Create.css';
+import './pages.css';
 
 function CreateLeague() {
     const [leagueName, setLeagueName] = useState('');

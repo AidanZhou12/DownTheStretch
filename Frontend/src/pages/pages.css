@@ -13,3 +13,40 @@
 .back-button:hover {
   background-color: #444;
 }
+
+.form-field {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.create-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: #222;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.login-button:hover {
+  background-color: #444;
+}
+
+.join-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
