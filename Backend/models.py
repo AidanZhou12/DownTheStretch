@@ -15,7 +15,7 @@ class League(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     teams: Mapped[list["Team"]] = relationship(back_populates="league")
-    draft: Mapped[list["Draft"]] = relationship(back_populates="league")
+    draft: Mapped["Draft"] = relationship(back_populates="league", uselist=False)
     matchups: Mapped[list["Matchup"]] = relationship(back_populates="league")
     current_week: Mapped[int] = mapped_column(nullable=False, default=1)
 
@@ -68,7 +68,7 @@ class Draft(Base):
     __tablename__ = "drafts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), nullable=False)
-    league: Mapped["League"] = relationship(back_populates="drafts")
+    league_id: Mapped[int] = mapped_column(ForeignKey("leagues.id"), unique=True, nullable=False)
+    league: Mapped["League"] = relationship(back_populates="draft")
     current_pick: Mapped[int] = mapped_column(nullable=False, default=1)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
