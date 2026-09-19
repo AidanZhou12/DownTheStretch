@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 
 class TeamBase(BaseModel):
@@ -12,9 +13,9 @@ class TeamResponse(TeamBase):
     password: str
     league_id: int
     draft_position: int
-    players: list["PlayerResponse"] = []
-    home_matchups: list["MatchupResponse"] = []
-    away_matchups: list["MatchupResponse"] = []
+    players: list[PlayerResponse] = []
+    home_matchups: list[MatchupResponse] = []
+    away_matchups: list[MatchupResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -27,8 +28,8 @@ class LeagueCreate(LeagueBase):
 class LeagueResponse(LeagueBase):
     id: int
     teams: list[TeamResponse] = []
-    draft: "DraftResponse" | None = None
-    matchups: list["MatchupResponse"] = []
+    draft: DraftResponse | None = None
+    matchups: list[MatchupResponse] = []
     current_week: int
 
     model_config = ConfigDict(from_attributes=True)
