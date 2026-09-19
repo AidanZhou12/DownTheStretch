@@ -17,6 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(team.router, prefix="/teams", tags=["teams"])
+app.include_router(teams.router, prefix="/teams", tags=["teams"])
 app.include_router(league.router, prefix="/leagues", tags=["leagues"])
 app.include_router(draft.router, prefix="/drafts", tags=["drafts"])
