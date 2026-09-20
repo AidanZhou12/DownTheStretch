@@ -15,7 +15,9 @@ def create_league(league: LeagueCreate, db: Annotated[Session, Depends(get_db)])
     if existing_league:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="League with this name already exists")
     new_league = models.League(name=league.name)
+    new_draft = models.Draft(league=new_league)
     db.add(new_league)
+    db.add(new_draft)
     db.commit()
     db.refresh(new_league)
     return new_league
