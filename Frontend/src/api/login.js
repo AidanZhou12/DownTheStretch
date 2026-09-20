@@ -7,3 +7,12 @@ export async function getTeam(teamName) {
     }
     return await response.json();
 }
+
+export async function getCount(leagueID) {
+    const response = await fetch(`${API_URL}/leagues/id/${leagueID}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch league');
+    }
+    const league = await response.json();
+    return league.teams.length;
+}

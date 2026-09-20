@@ -1,12 +1,14 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
-import { getTeam } from '../api/login';
+import { getTeam, getCount } from '../api/login';
+import { useNavigate } from 'react-router';
 import './pages.css';
 
 function LoginPage() {
     const [teamName, setTeamName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     return (
         <main>
             <Link to="/" className="back-button">Back</Link>
@@ -21,7 +23,13 @@ function LoginPage() {
                         if (team.password !== password) {
                             throw new Error('Incorrect password');
                         }
-                        alert('Login successful! \nYou can now access your team.');
+                        const teamCount = await getCount(team.league_id);
+                        if (teamCount === 5) {
+                            navigate('/ready');
+                        }
+                        else {
+                            navigate('/unready');
+                        }
                     } catch (err) {
                         setError(err.message);
                     }
