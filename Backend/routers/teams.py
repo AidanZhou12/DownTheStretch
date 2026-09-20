@@ -33,7 +33,7 @@ def create_team(team: TeamCreate, db: Annotated[Session, Depends(get_db)]):
 
 @router.get("/{name}", response_model=TeamResponse)
 def get_team(name: str, db: Annotated[Session, Depends(get_db)]):
-    team = db.execute(select(models.Team).where(models.Team.name == name)).scalar_one_or_none()
+    team = db.execute(select(models.Team).where(models.Team.name == name).options(selectinload(models.Team.players), selectinload(models.Team.home_matchups), selectinload(models.Team.away_matchups))).scalar_one_or_none()
     if not team:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
     return team

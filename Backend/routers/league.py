@@ -29,7 +29,7 @@ def get_leagues(db: Annotated[Session, Depends(get_db)]):
 
 @router.get("/{name}", response_model=LeagueResponse)
 def get_league(name: str, db: Annotated[Session, Depends(get_db)]):
-    league = db.execute(select(models.League).where(models.League.name == name)).scalar_one_or_none()
+    league = db.execute(select(models.League).where(models.League.name == name).options(selectinload(models.League.teams), selectinload(models.League.draft))).scalar_one_or_none()
     if not league:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="League not found")
     return league
