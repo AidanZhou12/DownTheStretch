@@ -30,7 +30,8 @@ function LoginPage() {
                         else {
                             navigate('/unready');
                         }
-                    } catch (err) {
+                    }
+                    catch (err) {
                         setError(err.message);
                     }
                 }}>
