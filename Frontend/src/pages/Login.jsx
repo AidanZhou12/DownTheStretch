@@ -1,11 +1,56 @@
 import { Link } from 'react-router';
+import { useState } from 'react';
+import { getTeam, getCount } from '../api/login';
+import { useNavigate } from 'react-router';
 import './pages.css';
 
 function LoginPage() {
+    const [teamName, setTeamName] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
     return (
         <main>
             <Link to="/" className="back-button">Back</Link>
-            <h1>Login Page</h1>
+            <Link to="/login" className="login-button">Login</Link>
+            <h1>Login</h1>
+            <div className="login-page">
+                <form className="login-form" onSubmit={async (e) => {
+                    e.preventDefault();
+                    setError('');
+                    try {
+                        const team = await getTeam(teamName);
+                        if (team.password !== password) {
+                            throw new Error('Incorrect password');
+                        }
+                        const teamCount = await getCount(team.league_id);
+                        if (teamCount === 5) {
+                            navigate('/ready');
+                        }
+                        else {
+                            navigate('/unready');
+                        }
+                    }
+                    catch (err) {
+                        setError(err.message);
+                    }
+                }}>
+                    <div className="form-field">
+                        <label>
+                            Team Name:
+                            <input type="text" value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
+                        </label>
+                    </div>
+                    <div className="form-field">
+                        <label>
+                            Password:
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        </label>
+                    </div>
+                    {error && <p className="error">{error}</p>}
+                    <button type="submit">Login</button>
+                </form>
+            </div>
         </main>
     );
 }

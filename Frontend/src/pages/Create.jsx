@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { createLeague, createTeam } from '../api/create';
 import './pages.css';
 
@@ -8,6 +9,7 @@ function CreateLeague() {
     const [teamName, setTeamName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     return (
         <main>
             <Link to="/" className="back-button">Back</Link>
@@ -20,8 +22,9 @@ function CreateLeague() {
                     try {
                         await createLeague(leagueName);
                         await createTeam(leagueName, teamName, password);
-                        alert('League and Team created successfully! \nYou can now log in with your team.');
-                    } catch (err) {
+                        navigate('/unready');
+                    }
+                    catch (err) {
                         setError(err.message);
                     }
                 }}>
