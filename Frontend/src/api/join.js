@@ -32,3 +32,12 @@ export async function getCount(leagueName) {
     const league = await response.json();
     return league.teams.length;
 }
+
+export async function getDraftStatus(leagueName) {
+    const response = await fetch(`${API_URL}/leagues/${leagueName}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch league');
+    }
+    const league = await response.json();
+    return league.draft.status;
+}
