@@ -2,7 +2,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 
 export async function startDraft(leagueID) {
-    const response = await fetch(`${API_URL}/drafts/${leagueID}/draft`, {
+    const response = await fetch(`${API_URL}/drafts/${leagueID}/start`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',

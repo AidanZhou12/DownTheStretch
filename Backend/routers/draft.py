@@ -8,7 +8,7 @@ from schemas import TeamBase, TeamCreate, TeamResponse, DraftRequest, DraftRespo
 
 router = APIRouter()
 
-@router.patch("/{league_id}/draft", response_model=DraftResponse)
+@router.patch("/{league_id}/start", response_model=DraftResponse)
 def start_draft(league_id: int, db: Annotated[Session, Depends(get_db)]):
     league = db.execute(select(models.League).where(models.League.id == league_id).options(selectinload(models.League.teams), selectinload(models.League.draft))).scalar_one_or_none()
     if not league:
