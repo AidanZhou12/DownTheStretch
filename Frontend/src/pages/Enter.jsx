@@ -5,7 +5,7 @@ import './pages.css';
 
 function EnterPage() {
     return (
-        <h1>Enter Page</h1>
+        <h1>Your Draft Has Started</h1>
     )
 }
 
