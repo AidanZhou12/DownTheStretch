@@ -15,7 +15,7 @@ function EnterPage() {
                 <p>Someone in your league started the draft. Join the draft.</p>
                 <button onClick={async () => {
                     setError('');
-                    navigate('/draft', { state: { teamName: state.teamName } });
+                    navigate('/draft', { state: { teamName: state.teamName, leagueID: state.leagueID } });
                 }}>Enter Draft</button>
                 {error && <p className="error">{error}</p>}
             </div>

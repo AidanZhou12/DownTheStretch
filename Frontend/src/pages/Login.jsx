@@ -25,7 +25,10 @@ function LoginPage() {
                         }
                         const teamCount = await getCount(team.league_id);
                         const draftStatus = await getDraftStatus(team.league_id);
-                        if (draftStatus === 'started') {
+                        if (draftStatus === 'completed') {
+                            navigate('/league', { state: { teamName, leagueID: team.league_id } });
+                        }
+                        else if (draftStatus === 'started') {
                             navigate('/enter', { state: { teamName, leagueID: team.league_id } });
                         }
                         else if (teamCount === 5) {

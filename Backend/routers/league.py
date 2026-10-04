@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
 from database import get_db
 from typing import Annotated
-from schemas import LeagueCreate, LeagueBase, LeagueResponse
+from schemas import LeagueCreate, LeagueBase, LeagueResponse, PlayerResponse
 import models
 
 router = APIRouter()
@@ -40,3 +40,16 @@ def get_league_by_id(id: int, db: Annotated[Session, Depends(get_db)]):
     if not league:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="League not found")
     return league
+
+@router.get("/{id}/available", response_model = list[PlayerResponse])
+def get_available_players(id: int, db: Annotated[Session, Depends(get_db)]):
+    league = db.execute(select(models.League).where(models.League.id == id).options(selectinload(models.League.teams).selectinload(models.Team.players))).scalar_one_or_none()
+    if not league:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="League not found")
+    players = db.execute(select(models.Player).selectinload(models.Player.teams)).scalars().all()
+    available_players = []
+    teams = league.teams
+    for player in players:
+        if not any(player in team.players for team in teams):
+            available_players.append(player)
+    return available_players
