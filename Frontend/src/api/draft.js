@@ -64,18 +64,14 @@ export async function getTeams(leagueID) {
     return data.teams;
 }
 
-export async function whosTurn(pick) {
-    let round_number = pick - 1;
-    let position_in_round = round_number % 5;
-    if (round_number % 2 == 0) {
-        return position_in_round + 1;
-    }
-    else {
-        return 5 - position_in_round;
-    }
+export function whosTurn(pick) {
+    const round = Math.floor((pick - 1) / 5);
+    const position = (pick - 1) % 5;
+
+    return round % 2 === 0 ? position + 1 : 5 - position;
 }
 
-export async function pickingTeam(teams, currentTurn) {
+export function pickingTeam(teams, currentTurn) {
     for (const team of teams) {
         if (team.draft_position === currentTurn) {
             return team.name;

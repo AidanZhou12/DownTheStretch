@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router';
-import { useState } from 'react';
-import { getDraftStatus, draftPlayer, getRoster, getAvailablePlayers, getTeams, whosTurn } from '../api/draft';
+import { useState, useEffect } from 'react';
+import { getDraftStatus, draftPlayer, getRoster, getAvailablePlayers, getTeams, whosTurn, pickingTeam as findPickingTeam } from '../api/draft';
 import './pages.css';
 
 function DraftPage() {
@@ -16,25 +16,54 @@ function DraftPage() {
     const [currentTurn, setCurrentTurn] = useState(null);
     const [pickingTeam, setPickingTeam] = useState(null);
 
-    const teams = getTeams(state.leagueID);
+    const [roster, setRoster] = useState([]);
+    const leagueID = state?.leagueID;
+    const teamName = state?.teamName;
 
     useEffect(() => {
-        setLoading(true);
-        getDraftStatus(state.leagueID).then((status) => {
-            setDraftStatus(status.status);
-            setCurrentPick(status.current_pick);
-            setCurrentTurn(whosTurn(currentPick));
-            setPickingTeam(pickingTeam(teams, currentTurn));
-        });
-        getRoster(state.teamName)
-        getAvailablePlayers(state.leagueID).then((players) => {
-            setAvailablePlayers(players);
-        }).catch((err) => {
-            setError(err.message);
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, [state]);
+        if (!leagueID || !teamName) return;
+
+        let cancelled = false;
+
+        async function loadDraft() {
+            setLoading(true);
+
+            try {
+                const [draft, teams, players, roster] = await Promise.all([
+                    getDraftStatus(leagueID),
+                    getTeams(leagueID),
+                    getAvailablePlayers(leagueID),
+                    getRoster(teamName),
+                ]);
+
+                if (cancelled) return;
+
+                const turn = whosTurn(draft.current_pick);
+
+                setDraftStatus(draft.status);
+                setCurrentPick(draft.current_pick);
+                setCurrentTurn(turn);
+                setPickingTeam(findPickingTeam(teams, turn));
+                setAvailablePlayers(players);
+                setRoster(roster);
+                setError('');
+            } catch (err) {
+                if (!cancelled) setError(err.message);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        loadDraft();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [leagueID, teamName]);
+
+    if (!leagueID || !teamName) {
+        return <Link to="/login">Log in to enter the draft</Link>;
+    }
 
     if (draftStatus === 'completed') {
         return (
@@ -67,20 +96,24 @@ function DraftPage() {
                 <h2>Available Players</h2>
                 {loading && <p>Loading...</p>}
                 {error && <p>{error}</p>}
+                <table><tbody>
                 {availablePlayers.map((player) => <tr key={player.id}>
                     <td>{player.name}</td>
                     <td>{player.position}</td>
                     <td>{player.school}</td>
-                    <td><button onClick={() => draftPlayer(state.leagueID, state.teamName, player.id)}>Draft</button></td>
+                    <td><button onClick={() => draftPlayer(teamName, player.id)}>Draft</button></td>
                 </tr>)}
+                </tbody></table>
                 <h2>Your Team</h2>
                 {loading && <p>Loading...</p>}
                 {error && <p>{error}</p>}
-                {getRoster(state.teamName).map((player) => <tr key={player.id}>
+                <table><tbody>
+                {roster.map((player) => <tr key={player.id}>
                     <td>{player.name}</td>
                     <td>{player.position}</td>
                     <td>{player.school}</td>
                 </tr>)}
+                </tbody></table>
             </main>
         )
     }
