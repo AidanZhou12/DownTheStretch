@@ -1,13 +1,31 @@
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
+import { useState } from 'react';
+import { getLeagueID, startDraft } from '../api/ready';
 import './pages.css';
 
 function ReadyPage() {
+    const { state } = useLocation();
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
+
     return (
         <main>
             <Link to="/" className="back-button">Back</Link>
             <h1>League Ready</h1>
             <div className="ready-page">
-                <p>The league is ready to start drafting!</p>
+                <p>All teams have joined the league. The draft can now be started.</p>
+                <button onClick={async () => {
+                    setError('');
+                    try {
+                        const leagueID = await getLeagueID(state.teamName);
+                        await startDraft(leagueID);
+                        navigate('/enter', { state: { teamName: state.teamName } });
+                    }
+                    catch (err) {
+                        setError(err.message);
+                    }
+                }}>Start Draft</button>
+                {error && <p className="error">{error}</p>}
             </div>
         </main>
     );

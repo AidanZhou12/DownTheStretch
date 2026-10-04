@@ -24,13 +24,13 @@ function JoinLeague() {
                         const teamCount = await getCount(leagueName);
                         const draftStatus = await getDraftStatus(leagueName);
                         if (draftStatus === 'started') {
-                            navigate('/enter');
+                            navigate('/enter', { state: { teamName } });
                         }
                         else if (teamCount === 5) {
-                            navigate('/ready');
+                            navigate('/ready', { state: { teamName } });
                         }
                         else {
-                            navigate('/unready');
+                            navigate('/unready', { state: { teamName } });
                         }
                     }
                     catch (err) {

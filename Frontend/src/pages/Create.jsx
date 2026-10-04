@@ -22,7 +22,7 @@ function CreateLeague() {
                     try {
                         await createLeague(leagueName);
                         await createTeam(leagueName, teamName, password);
-                        navigate('/unready');
+                        navigate('/unready', { state: { teamName } });
                     }
                     catch (err) {
                         setError(err.message);
