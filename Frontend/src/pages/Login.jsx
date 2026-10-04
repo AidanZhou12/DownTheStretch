@@ -26,13 +26,13 @@ function LoginPage() {
                         const teamCount = await getCount(team.league_id);
                         const draftStatus = await getDraftStatus(team.league_id);
                         if (draftStatus === 'started') {
-                            navigate('/enter', { state: { teamName } });
+                            navigate('/enter', { state: { teamName, leagueID: team.league_id } });
                         }
                         else if (teamCount === 5) {
-                            navigate('/ready', { state: { teamName } });
+                            navigate('/ready', { state: { teamName, leagueID: team.league_id } });
                         }
                         else {
-                            navigate('/unready', { state: { teamName } });
+                            navigate('/unready', { state: { teamName, leagueID: team.league_id } });
                         }
                     }
                     catch (err) {

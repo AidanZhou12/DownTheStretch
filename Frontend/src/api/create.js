@@ -40,3 +40,12 @@ export async function createTeam(leagueName, teamName, password) {
 
     return response.json();
 }
+
+export async function getLeagueID(leagueName) {
+    const response = await fetch(`${API_URL}/leagues/${leagueName}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch league');
+    }
+    const league = await response.json();
+    return league.id;
+}

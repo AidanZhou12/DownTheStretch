@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { createLeague, createTeam } from '../api/create';
+import { createLeague, createTeam, getLeagueID } from '../api/create';
 import './pages.css';
 
 function CreateLeague() {
@@ -22,7 +22,8 @@ function CreateLeague() {
                     try {
                         await createLeague(leagueName);
                         await createTeam(leagueName, teamName, password);
-                        navigate('/unready', { state: { teamName } });
+                        const leagueID = await getLeagueID(leagueName);
+                        navigate('/unready', { state: { teamName, leagueID } });
                     }
                     catch (err) {
                         setError(err.message);

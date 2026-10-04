@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useNavigate } from 'react-router';
 import './pages.css';
-import { createTeam, getCount, getDraftStatus } from '../api/join';
+import { createTeam, getCount, getDraftStatus, getLeagueID } from '../api/join';
 import { useState } from 'react';
 
 function JoinLeague() {
@@ -23,14 +23,15 @@ function JoinLeague() {
                         await createTeam(leagueName, teamName, password);
                         const teamCount = await getCount(leagueName);
                         const draftStatus = await getDraftStatus(leagueName);
+                        const leagueID = await getLeagueID(leagueName);
                         if (draftStatus === 'started') {
-                            navigate('/enter', { state: { teamName } });
+                            navigate('/enter', { state: { teamName, leagueID } });
                         }
                         else if (teamCount === 5) {
-                            navigate('/ready', { state: { teamName } });
+                            navigate('/ready', { state: { teamName, leagueID } });
                         }
                         else {
-                            navigate('/unready', { state: { teamName } });
+                            navigate('/unready', { state: { teamName, leagueID } });
                         }
                     }
                     catch (err) {
