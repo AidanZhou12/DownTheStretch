@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { getDraftStatus, draftPlayer, getRoster, getAvailablePlayers, getTeams, whosTurn, pickingTeam as findPickingTeam } from '../api/draft';
 import './pages.css';
 
+const ROSTER_LIMITS = { QB: 1, RB: 2, WR: 3, TE: 1 };
+
 function DraftPage() {
     const { state } = useLocation();
     const navigate = useNavigate();
@@ -22,6 +24,13 @@ function DraftPage() {
     const [roster, setRoster] = useState([]);
     const leagueID = state?.leagueID;
     const teamName = state?.teamName;
+    const rosterSlots = Object.entries(ROSTER_LIMITS).flatMap(([position, limit]) => {
+        const players = roster.filter(player => player.position === position);
+        return Array.from({ length: limit }, (_, index) => ({
+            label: limit === 1 ? position : `${position} ${index + 1}`,
+            player: players[index],
+        }));
+    });
     const filteredPlayers = availablePlayers.filter((player) =>
         player.name.toLowerCase().includes(searchText.trim().toLowerCase()) &&
         (positionFilter === 'All' || player.position === positionFilter)
@@ -137,10 +146,10 @@ function DraftPage() {
                 {error && <p>{error}</p>}
                 <div className="draft-roster">
                 <table><tbody>
-                {roster.map((player) => <tr key={player.id}>
-                    <td>{player.name}</td>
-                    <td>{player.position}</td>
-                    <td>{player.school}</td>
+                {rosterSlots.map((slot) => <tr key={slot.label}>
+                    <td>{slot.label}</td>
+                    <td>{slot.player?.name ?? 'Empty'}</td>
+                    <td>{slot.player?.school ?? '—'}</td>
                 </tr>)}
                 </tbody></table>
                 </div>
