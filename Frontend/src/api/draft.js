@@ -15,7 +15,7 @@ export async function draftPlayer(teamName, playerID) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ teamName: teamName, player_id: playerID }),
+        body: JSON.stringify({ team_name: teamName, player_id: playerID }),
     });
 
     if (!response.ok) {

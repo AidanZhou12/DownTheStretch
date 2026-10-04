@@ -57,3 +57,33 @@
     justify-content: center;
     align-items: center;
 }
+
+.draft-page {
+    padding: 0 16px 24px;
+}
+
+.draft-players-scroll,
+.draft-roster {
+    width: 100%;
+    max-width: 760px;
+    margin: 12px auto 24px;
+    overflow-x: auto;
+}
+
+.draft-players-scroll {
+    max-height: min(40vh, 360px);
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.draft-page table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.draft-page td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}

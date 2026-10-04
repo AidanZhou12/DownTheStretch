@@ -7,6 +7,9 @@ function DraftPage() {
     const { state } = useLocation();
     const navigate = useNavigate();
     const [error, setError] = useState('');
+    const [pickError, setPickError] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [refreshVersion, setRefreshVersion] = useState(0);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
     const [positionFilter, setPositionFilter] = useState('All');
@@ -19,15 +22,19 @@ function DraftPage() {
     const [roster, setRoster] = useState([]);
     const leagueID = state?.leagueID;
     const teamName = state?.teamName;
+    const filteredPlayers = availablePlayers.filter((player) =>
+        player.name.toLowerCase().includes(searchText.trim().toLowerCase()) &&
+        (positionFilter === 'All' || player.position === positionFilter)
+    );
 
     useEffect(() => {
         if (!leagueID || !teamName) return;
 
         let cancelled = false;
+        let timer;
+        let completed = false;
 
         async function loadDraft() {
-            setLoading(true);
-
             try {
                 const [draft, teams, players, roster] = await Promise.all([
                     getDraftStatus(leagueID),
@@ -39,6 +46,7 @@ function DraftPage() {
                 if (cancelled) return;
 
                 const turn = whosTurn(draft.current_pick);
+                completed = draft.status === 'completed';
 
                 setDraftStatus(draft.status);
                 setCurrentPick(draft.current_pick);
@@ -50,7 +58,10 @@ function DraftPage() {
             } catch (err) {
                 if (!cancelled) setError(err.message);
             } finally {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) {
+                    setLoading(false);
+                    if (!completed) timer = setTimeout(loadDraft, 2000);
+                }
             }
         }
 
@@ -58,8 +69,23 @@ function DraftPage() {
 
         return () => {
             cancelled = true;
+            clearTimeout(timer);
         };
-    }, [leagueID, teamName]);
+    }, [leagueID, teamName, refreshVersion]);
+
+    async function handleDraft(playerID) {
+        setSubmitting(true);
+        setPickError('');
+
+        try {
+            await draftPlayer(teamName, playerID);
+        } catch (err) {
+            setPickError(err.message);
+        } finally {
+            setSubmitting(false);
+            setRefreshVersion(version => version + 1);
+        }
+    }
 
     if (!leagueID || !teamName) {
         return <Link to="/login">Log in to enter the draft</Link>;
@@ -77,7 +103,7 @@ function DraftPage() {
 
     else {
         return (
-            <main>
+            <main className="draft-page">
                 <h1>Draft Page</h1>
                 <h2>Picking: {pickingTeam}</h2>
                 <select value={positionFilter} onChange={(e) => setPositionFilter(e.target.value)}>
@@ -95,18 +121,21 @@ function DraftPage() {
                 />
                 <h2>Available Players</h2>
                 {loading && <p>Loading...</p>}
-                {error && <p>{error}</p>}
+                {(pickError || error) && <p>{pickError || error}</p>}
+                <div className="draft-players-scroll" role="region" aria-label="Available players" tabIndex={0}>
                 <table><tbody>
-                {availablePlayers.map((player) => <tr key={player.id}>
+                {filteredPlayers.map((player) => <tr key={player.id}>
                     <td>{player.name}</td>
                     <td>{player.position}</td>
                     <td>{player.school}</td>
-                    <td><button onClick={() => draftPlayer(teamName, player.id)}>Draft</button></td>
+                    <td><button disabled={submitting || loading || draftStatus !== 'started'} onClick={() => handleDraft(player.id)}>Draft</button></td>
                 </tr>)}
                 </tbody></table>
+                </div>
                 <h2>Your Team</h2>
                 {loading && <p>Loading...</p>}
                 {error && <p>{error}</p>}
+                <div className="draft-roster">
                 <table><tbody>
                 {roster.map((player) => <tr key={player.id}>
                     <td>{player.name}</td>
@@ -114,6 +143,7 @@ function DraftPage() {
                     <td>{player.school}</td>
                 </tr>)}
                 </tbody></table>
+                </div>
             </main>
         )
     }

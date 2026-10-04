@@ -13,7 +13,7 @@ class TeamResponse(TeamBase):
     password: str
     league_id: int
     draft_position: int
-    players: list[PlayerResponse] = []
+    players: list[DraftPickResponse] = []
     home_matchups: list[MatchupResponse] = []
     away_matchups: list[MatchupResponse] = []
 
@@ -63,8 +63,16 @@ class PlayerResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class DraftPickResponse(BaseModel):
+    id: int
+    cfbd_id: int
+    name: str
+    school: str
+    position: str
+
+    model_config = ConfigDict(from_attributes=True)
+
 class DraftRequest(BaseModel):
-    league_id: int
     player_id: int
     team_id: int
 
