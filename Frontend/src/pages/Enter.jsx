@@ -1,12 +1,26 @@
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import './pages.css';
 
 function EnterPage() {
+    const { state } = useLocation();
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
+
     return (
-        <h1>Your Draft Has Started</h1>
-    )
+        <main>
+            <Link to="/" className="back-button">Back</Link>
+            <h1>Draft Started</h1>
+            <div className="enter-page">
+                <p>Someone in your league started the draft. Join the draft.</p>
+                <button onClick={async () => {
+                    setError('');
+                    navigate('/draft', { state: { teamName: state.teamName } });
+                }}>Enter Draft</button>
+                {error && <p className="error">{error}</p>}
+            </div>
+        </main>
+    );
 }
 
 export default EnterPage;

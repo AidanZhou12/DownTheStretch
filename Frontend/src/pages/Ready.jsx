@@ -19,7 +19,7 @@ function ReadyPage() {
                     try {
                         const leagueID = await getLeagueID(state.teamName);
                         await startDraft(leagueID);
-                        navigate('/enter', { state: { teamName: state.teamName } });
+                        navigate('/draft', { state: { teamName: state.teamName } });
                     }
                     catch (err) {
                         setError(err.message);

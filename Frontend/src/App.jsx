@@ -7,6 +7,7 @@ import JoinLeague from "./pages/Join";
 import UnreadyPage from "./pages/Unready";
 import ReadyPage from "./pages/Ready";
 import EnterPage from "./pages/Enter";
+import DraftPage from "./pages/Draft";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/unready" element={<UnreadyPage />} />
       <Route path="/ready" element={<ReadyPage />} />
       <Route path="/enter" element={<EnterPage />} />
+      <Route path="/draft" element={<DraftPage />} />
     </Routes>
   )
 }
