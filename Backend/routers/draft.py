@@ -62,9 +62,15 @@ def draft_player(teamName: str, player_id: int, db: Annotated[Session, Depends(g
     current_turn = get_current_turn(draft.current_pick)
     if team.draft_position != current_turn:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="It's not your turn to pick")
-    player = db.execute(select(models.Player).where(models.Player.id == player_id)).scalar_one_or_none()
+    player = db.execute(select(models.Player).where(models.Player.id == player_id).options(selectinload(models.Player.teams))).scalar_one_or_none()
     if not player:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player not found")
+    if player in team.players:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Player has already been drafted by your team")
+    opponents = db.execute(select(models.Team).where(models.Team.league_id == league.id, models.Team.id != team.id).options(selectinload(models.Team.players))).scalars().all()
+    for opponent in opponents:
+        if player in opponent.players:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Player has already been drafted by another team")
     position_count = sum(1 for p in team.players if p.position == player.position)
     if position_count >= ROSTER_LIMITS.get(player.position, 0):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Cannot draft more players for position {player.position}")
