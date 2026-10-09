@@ -27,7 +27,7 @@ function JoinLeague() {
                         if (draftStatus === 'started') {
                             navigate('/enter', { state: { teamName, leagueID } });
                         }
-                        else if (teamCount === 5) {
+                        else if (teamCount === 6) {
                             navigate('/ready', { state: { teamName, leagueID } });
                         }
                         else {

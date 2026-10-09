@@ -65,10 +65,10 @@ export async function getTeams(leagueID) {
 }
 
 export function whosTurn(pick) {
-    const round = Math.floor((pick - 1) / 5);
-    const position = (pick - 1) % 5;
+    const round = Math.floor((pick - 1) / 6);
+    const position = (pick - 1) % 6;
 
-    return round % 2 === 0 ? position + 1 : 5 - position;
+    return round % 2 === 0 ? position + 1 : 6 - position;
 }
 
 export function pickingTeam(teams, currentTurn) {

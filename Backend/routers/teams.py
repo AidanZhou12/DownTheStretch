@@ -13,8 +13,8 @@ def create_team(team: TeamCreate, db: Annotated[Session, Depends(get_db)]):
     league = db.execute(select(models.League).where(models.League.id == team.league_id)).scalar_one_or_none()
     if not league:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="League not found")
-    if len(league.teams) == 5:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="League already has 5 teams")
+    if len(league.teams) >= 6:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="League already has 6 teams")
     draft_position = len(league.teams) + 1
     statement = select(models.Team).where(models.Team.name == team.name)
     existing_team = db.execute(statement).scalar_one_or_none()
