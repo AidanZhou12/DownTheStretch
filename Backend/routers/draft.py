@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
 import models
 from database import get_db
+from scheduling import generate_regular_season_schedule
 from typing import Annotated
 from schemas import TeamBase, TeamCreate, TeamResponse, DraftRequest, DraftResponse, DraftPickResponse, LeagueResponse, MatchupResponse, PlayerResponse
 
@@ -80,6 +81,7 @@ def draft_player(teamName: str, player_id: int, db: Annotated[Session, Depends(g
     draft.current_pick += 1
     if draft.current_pick > TOTAL_PICKS:
         draft.status = "completed"
+        generate_regular_season_schedule(db, league)
     db.commit()
     db.refresh(player)
     return player
