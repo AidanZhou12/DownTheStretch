@@ -5,7 +5,7 @@ import models
 from database import get_db
 from scheduling import generate_regular_season_schedule
 from typing import Annotated
-from schemas import TeamBase, TeamCreate, TeamResponse, DraftRequest, DraftResponse, DraftPickResponse, LeagueResponse, MatchupResponse, PlayerResponse
+from schemas import TeamBase, TeamCreate, TeamResponse, DraftRequest, DraftResponse, RosterPlayerResponse, LeagueResponse, MatchupResponse, PlayerResponse
 
 router = APIRouter()
 
@@ -51,7 +51,7 @@ def get_draft_status(league_id: int, db: Annotated[Session, Depends(get_db)]):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="League not found")
     return league.draft
 
-@router.patch("/{teamName}/{player_id}/pick", response_model=DraftPickResponse)
+@router.patch("/{teamName}/{player_id}/pick", response_model=RosterPlayerResponse)
 def draft_player(teamName: str, player_id: int, db: Annotated[Session, Depends(get_db)]):
     team = db.execute(select(models.Team).where(models.Team.name == teamName).options(selectinload(models.Team.league), selectinload(models.Team.players))).scalar_one_or_none()
     if not team:
