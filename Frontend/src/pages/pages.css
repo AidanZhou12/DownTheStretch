@@ -87,3 +87,42 @@
     border-bottom: 1px solid var(--border);
     text-align: center;
 }
+
+.league-page {
+    padding: 24px clamp(16px, 4vw, 48px);
+    text-align: left;
+}
+
+.league-tabs {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+}
+
+.league-tabs button {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.league-tabs button:hover,
+.league-tabs button[aria-selected="true"] {
+    color: #ff4b4b;
+}
+
+.league-tabs button[aria-selected="true"] {
+    border-bottom-color: #ff4b4b;
+}
+
+.league-tabs button:focus-visible {
+    outline: 2px solid #ff4b4b;
+    outline-offset: -2px;
+}
