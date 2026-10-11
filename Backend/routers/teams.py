@@ -68,14 +68,21 @@ def swap_players(team_id: int, player1_id: int, player2_id: int, db: Annotated[S
     player2 = db.execute(select(models.Player).where(models.Player.id == player2_id)).scalar_one_or_none()
     if not player1 or not player2:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="One or both players not found")
-    if player1 not in team.players and player2 not in team.players:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Neither player is on the team")
-    if player1 in team.players:
-        team.players.remove(player1)
-        team.players.append(player2)
-    else:
-        team.players.remove(player2)
-        team.players.append(player1)
+    if player1 not in team.players:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Player to drop is not on the team")
+    if player2 in team.players:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Player to add is already on the team")
+    other_owner = db.execute(select(models.Team).where(
+        models.Team.league_id == team.league_id,
+        models.Team.id != team.id,
+        models.Team.players.any(models.Player.id == player2_id),
+    )).scalars().first()
+    if other_owner:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Player to add is already on another team in the league")
+    if player1.position != player2.position:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Players must be of the same position to swap")
+    team.players.remove(player1)
+    team.players.append(player2)
     db.commit()
     db.refresh(team)
     return team

@@ -9,6 +9,7 @@ import ReadyPage from "./pages/Ready";
 import EnterPage from "./pages/Enter";
 import DraftPage from "./pages/Draft";
 import LeaguePage from "./pages/League";
+import WaiverPage from "./pages/Waiver";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/enter" element={<EnterPage />} />
       <Route path="/draft" element={<DraftPage />} />
       <Route path="/league" element={<LeaguePage />} />
+      <Route path="/waiver" element={<WaiverPage />} />
     </Routes>
   )
 }

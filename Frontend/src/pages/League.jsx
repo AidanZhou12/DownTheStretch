@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { getTeam, getMatchup, getTeamByID, getAvailablePlayers, getStandings } from '../api/league';
 import './pages.css';
 
@@ -22,6 +22,7 @@ function LeaguePage() {
     const [allTeams, setAllTeams] = useState([]);
     const tabRefs = useRef([]);
     const { state } = useLocation();
+    const navigate = useNavigate();
     const teamName = state?.teamName;
     const leagueID = state?.leagueID;
     const filteredPlayers = availablePlayers.filter(player =>
@@ -192,6 +193,17 @@ function LeaguePage() {
                                                 <td>{player.name}</td>
                                                 <td>{player.position}</td>
                                                 <td>{player.school}</td>
+                                                <td>
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`Add ${player.name}`}
+                                                        onClick={() => navigate('/waiver', {
+                                                            state: { teamName, leagueID, player },
+                                                        })}
+                                                    >
+                                                        Add
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
