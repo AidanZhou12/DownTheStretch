@@ -1,11 +1,21 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router';
+import { getTeam } from '../api/league';
 import './pages.css';
 
 const TABS = ['Team', 'Matchup', 'Waivers', 'Standings'];
+const POSITION_ORDER = { QB: 0, RB: 1, WR: 2, TE: 3 };
 
 function LeaguePage() {
     const [activeTab, setActiveTab] = useState(0);
+    const [roster, setRoster] = useState([]);
     const tabRefs = useRef([]);
+    const { state } = useLocation();
+    const teamName = state?.teamName;
+    const leagueID = state?.leagueID;
+    const sortedRoster = [...roster].sort((a, b) =>
+        (POSITION_ORDER[a.position] ?? 4) - (POSITION_ORDER[b.position] ?? 4)
+    );
 
     function handleTabKeyDown(event, index) {
         let nextTab;
@@ -18,6 +28,29 @@ function LeaguePage() {
         event.preventDefault();
         setActiveTab(nextTab);
         tabRefs.current[nextTab].focus();
+    }
+
+    useEffect(() => {
+        if (!teamName || !leagueID) return;
+        async function fetchRoster() {
+            try {
+                const teamRoster = await getTeam(teamName);
+                setRoster(teamRoster);
+            } catch (error) {
+                console.error('Error fetching roster:', error);
+            }
+        }
+
+        fetchRoster();
+    }, [teamName]);
+
+    if (!teamName || !leagueID) {
+        return (
+            <main>
+                <p>Error: Missing team name or league ID.</p>
+                <Link to="/login">Go back to login</Link>
+            </main>
+        );
     }
 
     return (
@@ -50,6 +83,25 @@ function LeaguePage() {
                     tabIndex={0}
                 >
                     <h1>{label}</h1>
+                    {label === 'Team' && (
+                        <div className="league-roster">
+                            {sortedRoster.map(player => (
+                                <div className="league-roster-row" key={player.id}>
+                                    <span>{player.position}: {player.name}</span>
+                                    <span className="league-roster-school">{player.school}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {label === 'Matchup' && (
+                        <p>Matchup placeholder: add your weekly matchup content here.</p>
+                    )}
+                    {label === 'Waivers' && (
+                        <p>Waivers placeholder: add available players and roster changes here.</p>
+                    )}
+                    {label === 'Standings' && (
+                        <p>Standings placeholder: add your league rankings here.</p>
+                    )}
                 </section>
             ))}
         </main>

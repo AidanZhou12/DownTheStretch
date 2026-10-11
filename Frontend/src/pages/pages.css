@@ -126,3 +126,20 @@
     outline: 2px solid #ff4b4b;
     outline-offset: -2px;
 }
+
+.league-roster {
+    border-top: 1px solid var(--border);
+}
+
+.league-roster-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.league-roster-school {
+    text-align: right;
+}
