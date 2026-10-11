@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { getTeam } from '../api/league';
+import { getTeam, getMatchup, getRoster, getAvailablePlayers } from '../api/league';
 import './pages.css';
 
 const TABS = ['Team', 'Matchup', 'Waivers', 'Standings'];
@@ -9,6 +9,10 @@ const POSITION_ORDER = { QB: 0, RB: 1, WR: 2, TE: 3 };
 function LeaguePage() {
     const [activeTab, setActiveTab] = useState(0);
     const [roster, setRoster] = useState([]);
+    const [availablePlayers, setAvailablePlayers] = useState([]);
+    const [matchup, setMatchup] = useState(null);
+    const [homeRoster, setHomeRoster] = useState([]);
+    const [awayRoster, setAwayRoster] = useState([]);
     const tabRefs = useRef([]);
     const { state } = useLocation();
     const teamName = state?.teamName;
@@ -32,16 +36,28 @@ function LeaguePage() {
 
     useEffect(() => {
         if (!teamName || !leagueID) return;
-        async function fetchRoster() {
+        async function loadLeagueData() {
             try {
-                const teamRoster = await getTeam(teamName);
+                const [teamRoster, availablePlayersData, matchupData] = await Promise.all([
+                    getTeam(teamName),
+                    getAvailablePlayers(leagueID),
+                    getMatchup(teamName),
+                ]);
                 setRoster(teamRoster);
+                setAvailablePlayers(availablePlayersData);
+                setMatchup(matchupData);
+                const [homeRosterData, awayRosterData] = await Promise.all([
+                    getRoster(matchupData.home_team_id),
+                    getRoster(matchupData.away_team_id),
+                ]);
+                setHomeRoster(homeRosterData);
+                setAwayRoster(awayRosterData);
             } catch (error) {
-                console.error('Error fetching roster:', error);
+                console.error('Error loading league data:', error);
             }
         }
 
-        fetchRoster();
+        loadLeagueData();
     }, [teamName, leagueID]);
 
     if (!teamName || !leagueID) {

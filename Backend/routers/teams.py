@@ -38,6 +38,13 @@ def get_team(name: str, db: Annotated[Session, Depends(get_db)]):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
     return team
 
+@router.get("/id/{team_id}", response_model=TeamResponse)
+def get_team_by_id(team_id: int, db: Annotated[Session, Depends(get_db)]):
+    team = db.execute(select(models.Team).where(models.Team.id == team_id).options(selectinload(models.Team.players), selectinload(models.Team.home_matchups), selectinload(models.Team.away_matchups))).scalar_one_or_none()
+    if not team:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
+    return team
+
 @router.get("/{name}/matchup", response_model=MatchupResponse)
 def get_current_matchup(name: str, db: Annotated[Session, Depends(get_db)]):
     team = db.execute(select(models.Team).where(models.Team.name == name).options(selectinload(models.Team.league))).scalar_one_or_none()

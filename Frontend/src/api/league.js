@@ -8,3 +8,30 @@ export async function getTeam(teamName) {
     const team = await response.json();
     return team.players;
 }
+
+export async function getRoster(teamID) {
+    const response = await fetch(`${API_URL}/teams/id/${teamID}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch roster');
+    }
+    const roster = await response.json();
+    return roster.players;
+}
+
+export async function getMatchup(teamName) {
+    const response = await fetch(`${API_URL}/teams/${teamName}/matchup`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch matchup');
+    }
+    const matchup = await response.json();
+    return matchup;
+}
+
+export async function getAvailablePlayers(leagueID) {
+    const response = await fetch(`${API_URL}/leagues/${leagueID}/available`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch available players');
+    }
+    const data = await response.json();
+    return data;
+}
