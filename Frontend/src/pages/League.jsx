@@ -42,7 +42,7 @@ function LeaguePage() {
         }
 
         fetchRoster();
-    }, [teamName]);
+    }, [teamName, leagueID]);
 
     if (!teamName || !leagueID) {
         return (
