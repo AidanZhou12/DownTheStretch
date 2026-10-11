@@ -87,3 +87,137 @@
     border-bottom: 1px solid var(--border);
     text-align: center;
 }
+
+.league-page {
+    padding: 24px clamp(16px, 4vw, 48px);
+    text-align: left;
+}
+
+.league-page.has-page-navigation {
+    padding-top: 72px;
+}
+
+.league-tabs {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+}
+
+.league-tabs button {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.league-tabs button:hover,
+.league-tabs button[aria-selected="true"] {
+    color: #ff4b4b;
+}
+
+.league-tabs button[aria-selected="true"] {
+    border-bottom-color: #ff4b4b;
+}
+
+.league-tabs button:focus-visible {
+    outline: 2px solid #ff4b4b;
+    outline-offset: -2px;
+}
+
+.league-roster {
+    border-top: 1px solid var(--border);
+}
+
+.league-roster-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.league-roster-school {
+    text-align: right;
+}
+
+.league-waivers-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.league-waivers-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.league-waivers table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.league-waivers td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.league-matchup {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+}
+
+.league-matchup-team {
+    min-width: 0;
+}
+
+.league-matchup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.league-matchup-header h2 {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.league-matchup-score {
+    flex-shrink: 0;
+    color: var(--text-h);
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.league-matchup-score span {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.league-matchup .league-roster-row {
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.league-matchup .league-roster-row > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .league-matchup {
+        grid-template-columns: 1fr;
+    }
+}
