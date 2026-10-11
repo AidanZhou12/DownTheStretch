@@ -39,3 +39,49 @@ export async function getAvailablePlayers(leagueID) {
     const data = await response.json();
     return data;
 }
+
+export async function getAllTeams(leagueID) {
+    const response = await fetch(`${API_URL}/leagues/id/${leagueID}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch teams');
+    }
+    const data = await response.json();
+    return data.teams;
+}
+
+export async function getStandings(leagueID) {
+    const teams = await getAllTeams(leagueID);
+    let stats = {};
+    for (const team of teams) {
+        let info = {};
+        const teamName = team.name;
+        let wins = 0;
+        let losses = 0;
+        let points = 0.0;
+        for (const homeGame of team.home_matchups) {
+            points += homeGame.home_score;
+            if (homeGame.home_score > homeGame.away_score) {
+                wins++;
+            } else if (homeGame.home_score < homeGame.away_score) {
+                losses++;
+            }
+        }
+        for (const awayGame of team.away_matchups) {
+            points += awayGame.away_score;
+            if (awayGame.away_score > awayGame.home_score) {
+                wins++;
+            } else if (awayGame.away_score < awayGame.home_score) {
+                losses++;
+            }
+        }
+        info["wins"] = wins;
+        info["losses"] = losses;
+        info["points"] = points;
+        stats[teamName] = info;
+    }
+    return Object.entries(stats).map(([name, info]) => ({ name, ...info })).sort((a, b) =>
+        b.wins - a.wins ||
+        b.points - a.points ||
+        a.name.localeCompare(b.name, 'en')
+    );
+}

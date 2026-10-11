@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { getTeam, getMatchup, getTeamByID, getAvailablePlayers } from '../api/league';
+import { getTeam, getMatchup, getTeamByID, getAvailablePlayers, getStandings } from '../api/league';
 import './pages.css';
 
 const TABS = ['Team', 'Matchup', 'Waivers', 'Standings'];
@@ -19,6 +19,7 @@ function LeaguePage() {
     const [awayTeamName, setAwayTeamName] = useState('');
     const [matchupLoading, setMatchupLoading] = useState(true);
     const [matchupError, setMatchupError] = useState('');
+    const [allTeams, setAllTeams] = useState([]);
     const tabRefs = useRef([]);
     const { state } = useLocation();
     const teamName = state?.teamName;
@@ -51,15 +52,17 @@ function LeaguePage() {
             setMatchupLoading(true);
             setMatchupError('');
             try {
-                const [teamRoster, availablePlayersData, matchupData] = await Promise.all([
+                const [teamRoster, availablePlayersData, matchupData, allTeamsData] = await Promise.all([
                     getTeam(teamName),
                     getAvailablePlayers(leagueID),
                     getMatchup(teamName),
+                    getStandings(leagueID),
                 ]);
                 if (cancelled) return;
                 setRoster(teamRoster);
                 setAvailablePlayers(availablePlayersData);
                 setMatchup(matchupData);
+                setAllTeams(allTeamsData);
                 const [homeRosterData, awayRosterData] = await Promise.all([
                     getTeamByID(matchupData.home_team_id),
                     getTeamByID(matchupData.away_team_id),
@@ -197,7 +200,16 @@ function LeaguePage() {
                         </div>
                     )}
                     {label === 'Standings' && (
-                        <p>Standings placeholder: add your league rankings here.</p>
+                        <div className="league-roster">
+                            {allTeams.map((team, index) => (
+                                <div className="league-roster-row" key={team.name}>
+                                    <span>{index + 1}: {team.name}</span>
+                                    <span className="league-roster-school" aria-label={`Record: ${team.wins} wins, ${team.losses} losses`}>
+                                        {team.wins}-{team.losses}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </section>
             ))}
