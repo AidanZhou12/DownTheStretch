@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { getTeam, getMatchup, getRoster, getAvailablePlayers } from '../api/league';
+import { getTeam, getMatchup, getTeamByID, getAvailablePlayers } from '../api/league';
 import './pages.css';
 
 const TABS = ['Team', 'Matchup', 'Waivers', 'Standings'];
@@ -13,6 +13,10 @@ function LeaguePage() {
     const [matchup, setMatchup] = useState(null);
     const [homeRoster, setHomeRoster] = useState([]);
     const [awayRoster, setAwayRoster] = useState([]);
+    const [homeTeamName, setHomeTeamName] = useState('');
+    const [awayTeamName, setAwayTeamName] = useState('');
+    const [matchupLoading, setMatchupLoading] = useState(true);
+    const [matchupError, setMatchupError] = useState('');
     const tabRefs = useRef([]);
     const { state } = useLocation();
     const teamName = state?.teamName;
@@ -36,28 +40,39 @@ function LeaguePage() {
 
     useEffect(() => {
         if (!teamName || !leagueID) return;
+        let cancelled = false;
         async function loadLeagueData() {
+            setMatchupLoading(true);
+            setMatchupError('');
             try {
                 const [teamRoster, availablePlayersData, matchupData] = await Promise.all([
                     getTeam(teamName),
                     getAvailablePlayers(leagueID),
                     getMatchup(teamName),
                 ]);
+                if (cancelled) return;
                 setRoster(teamRoster);
                 setAvailablePlayers(availablePlayersData);
                 setMatchup(matchupData);
                 const [homeRosterData, awayRosterData] = await Promise.all([
-                    getRoster(matchupData.home_team_id),
-                    getRoster(matchupData.away_team_id),
+                    getTeamByID(matchupData.home_team_id),
+                    getTeamByID(matchupData.away_team_id),
                 ]);
-                setHomeRoster(homeRosterData);
-                setAwayRoster(awayRosterData);
+                if (cancelled) return;
+                setHomeRoster(homeRosterData.players);
+                setAwayRoster(awayRosterData.players);
+                setHomeTeamName(homeRosterData.name);
+                setAwayTeamName(awayRosterData.name);
             } catch (error) {
                 console.error('Error loading league data:', error);
+                if (!cancelled) setMatchupError(error.message);
+            } finally {
+                if (!cancelled) setMatchupLoading(false);
             }
         }
 
         loadLeagueData();
+        return () => { cancelled = true; };
     }, [teamName, leagueID]);
 
     if (!teamName || !leagueID) {
@@ -110,7 +125,34 @@ function LeaguePage() {
                         </div>
                     )}
                     {label === 'Matchup' && (
-                        <p>Matchup placeholder: add your weekly matchup content here.</p>
+                        matchupLoading ? <p>Loading matchup...</p> :
+                        matchupError ? <p role="alert">{matchupError}</p> :
+                        matchup ? <div className="league-matchup">
+                            {[
+                                { side: 'Home', name: homeTeamName, score: matchup.home_score, players: homeRoster },
+                                { side: 'Away', name: awayTeamName, score: matchup.away_score, players: awayRoster },
+                            ].map(team => (
+                                <section className="league-matchup-team" key={team.side} aria-label={`${team.side} team`}>
+                                    <div className="league-matchup-header">
+                                        <div>
+                                            <p>{team.side}</p>
+                                            <h2>{team.name}</h2>
+                                        </div>
+                                        <p className="league-matchup-score">{team.score ?? 0} <span>pts</span></p>
+                                    </div>
+                                    <div className="league-roster">
+                                        {[...team.players].sort((a, b) =>
+                                            (POSITION_ORDER[a.position] ?? 4) - (POSITION_ORDER[b.position] ?? 4)
+                                        ).map(player => (
+                                            <div className="league-roster-row" key={player.id}>
+                                                <span>{player.position}: {player.name}</span>
+                                                <span className="league-roster-school">{player.school}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </div> : <p>No matchup available.</p>
                     )}
                     {label === 'Waivers' && (
                         <p>Waivers placeholder: add available players and roster changes here.</p>

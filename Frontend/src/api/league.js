@@ -10,12 +10,16 @@ export async function getTeam(teamName) {
 }
 
 export async function getRoster(teamID) {
+    const team = await getTeamByID(teamID);
+    return team.players;
+}
+
+export async function getTeamByID(teamID) {
     const response = await fetch(`${API_URL}/teams/id/${teamID}`);
     if (!response.ok) {
         throw new Error('Failed to fetch roster');
     }
-    const roster = await response.json();
-    return roster.players;
+    return response.json();
 }
 
 export async function getMatchup(teamName) {

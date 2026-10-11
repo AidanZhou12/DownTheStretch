@@ -143,3 +143,54 @@
 .league-roster-school {
     text-align: right;
 }
+
+.league-matchup {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+}
+
+.league-matchup-team {
+    min-width: 0;
+}
+
+.league-matchup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.league-matchup-header h2 {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.league-matchup-score {
+    flex-shrink: 0;
+    color: var(--text-h);
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.league-matchup-score span {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.league-matchup .league-roster-row {
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.league-matchup .league-roster-row > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .league-matchup {
+        grid-template-columns: 1fr;
+    }
+}
