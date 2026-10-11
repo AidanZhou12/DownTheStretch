@@ -58,3 +58,24 @@ def get_current_matchup(name: str, db: Annotated[Session, Depends(get_db)]):
     if not matchup:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Matchup not found for the current week")
     return matchup
+
+@router.patch("/{team_id}/swap", response_model=TeamResponse)
+def swap_players(team_id: int, player1_id: int, player2_id: int, db: Annotated[Session, Depends(get_db)]):
+    team = db.execute(select(models.Team).where(models.Team.id == team_id).options(selectinload(models.Team.players))).scalar_one_or_none()
+    if not team:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
+    player1 = db.execute(select(models.Player).where(models.Player.id == player1_id)).scalar_one_or_none()
+    player2 = db.execute(select(models.Player).where(models.Player.id == player2_id)).scalar_one_or_none()
+    if not player1 or not player2:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="One or both players not found")
+    if player1 not in team.players and player2 not in team.players:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Neither player is on the team")
+    if player1 in team.players:
+        team.players.remove(player1)
+        team.players.append(player2)
+    else:
+        team.players.remove(player2)
+        team.players.append(player1)
+    db.commit()
+    db.refresh(team)
+    return team
