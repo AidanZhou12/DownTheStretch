@@ -10,6 +10,8 @@ function LeaguePage() {
     const [activeTab, setActiveTab] = useState(0);
     const [roster, setRoster] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
+    const [searchText, setSearchText] = useState('');
+    const [positionFilter, setPositionFilter] = useState('All');
     const [matchup, setMatchup] = useState(null);
     const [homeRoster, setHomeRoster] = useState([]);
     const [awayRoster, setAwayRoster] = useState([]);
@@ -21,6 +23,10 @@ function LeaguePage() {
     const { state } = useLocation();
     const teamName = state?.teamName;
     const leagueID = state?.leagueID;
+    const filteredPlayers = availablePlayers.filter(player =>
+        player.name.toLowerCase().includes(searchText.trim().toLowerCase()) &&
+        (positionFilter === 'All' || player.position === positionFilter)
+    );
     const sortedRoster = [...roster].sort((a, b) =>
         (POSITION_ORDER[a.position] ?? 4) - (POSITION_ORDER[b.position] ?? 4)
     );
@@ -155,7 +161,40 @@ function LeaguePage() {
                         </div> : <p>No matchup available.</p>
                     )}
                     {label === 'Waivers' && (
-                        <p>Waivers placeholder: add available players and roster changes here.</p>
+                        <div className="league-waivers">
+                            <div className="league-waivers-filters">
+                                <select
+                                    aria-label="Filter by position"
+                                    value={positionFilter}
+                                    onChange={event => setPositionFilter(event.target.value)}
+                                >
+                                    {['All', 'QB', 'RB', 'WR', 'TE'].map(position => (
+                                        <option key={position} value={position}>{position}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="text"
+                                    aria-label="Search players by name"
+                                    placeholder="Search by name"
+                                    value={searchText}
+                                    onChange={event => setSearchText(event.target.value)}
+                                />
+                            </div>
+                            <h2>Available Players</h2>
+                            <div className="league-waivers-table">
+                                <table aria-label="Available players">
+                                    <tbody>
+                                        {filteredPlayers.map(player => (
+                                            <tr key={player.id}>
+                                                <td>{player.name}</td>
+                                                <td>{player.position}</td>
+                                                <td>{player.school}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     )}
                     {label === 'Standings' && (
                         <p>Standings placeholder: add your league rankings here.</p>

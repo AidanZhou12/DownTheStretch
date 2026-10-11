@@ -144,6 +144,29 @@
     text-align: right;
 }
 
+.league-waivers-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.league-waivers-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.league-waivers table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.league-waivers td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
 .league-matchup {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
