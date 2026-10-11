@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import { getPosition, addPlayerToTeam } from '../api/waiver';
 import './pages.css';
@@ -11,7 +11,17 @@ function WaiverPage() {
     const [players, setPlayers] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const teamName = state?.teamName;
+    const leagueID = state?.leagueID;
     const position = state?.player?.position ?? state?.position;
+    const backLink = (
+        <Link
+            to={teamName && leagueID ? '/league' : '/login'}
+            state={teamName && leagueID ? { teamName, leagueID } : null}
+            className="back-button"
+        >
+            Back
+        </Link>
+    );
 
     useEffect(() => {
         if (!teamName || !position) {
@@ -39,7 +49,7 @@ function WaiverPage() {
         setError('');
         try {
             await addPlayerToTeam(teamName, playerToDrop.id, state.player.id);
-            navigate('/league', { state: { teamName, leagueID: state.leagueID } });
+            navigate('/league', { state: { teamName, leagueID } });
         } catch (err) {
             setError(err.message);
         } finally {
@@ -48,15 +58,16 @@ function WaiverPage() {
     }
 
     if (!teamName || !position || !state?.player?.id) {
-        return <main className="league-page"><p>Missing team or selected player. Return to the league and select a player to add.</p></main>;
+        return <main className="league-page has-page-navigation">{backLink}<p>Missing team or selected player. Return to the league and select a player to add.</p></main>;
     }
 
     if (loading) {
-        return <h1>Loading...</h1>;
+        return <main className="league-page has-page-navigation">{backLink}<h1>Loading...</h1></main>;
     }
 
     return (
-        <main className="league-page waiver-page">
+        <main className="league-page waiver-page has-page-navigation">
+            {backLink}
             <h1>Adding {state?.player?.name}</h1>
             <h2>Select the {position} to drop</h2>
             {error && <p role="alert">{error}</p>}

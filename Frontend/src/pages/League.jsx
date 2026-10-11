@@ -95,7 +95,8 @@ function LeaguePage() {
     }
 
     return (
-        <main className="league-page">
+        <main className="league-page has-page-navigation">
+            <Link to="/" replace state={null} className="back-button">Logout</Link>
             <div className="league-tabs" role="tablist" aria-label="League sections">
                 {TABS.map((label, index) => (
                     <button

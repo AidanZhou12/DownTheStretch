@@ -93,6 +93,10 @@
     text-align: left;
 }
 
+.league-page.has-page-navigation {
+    padding-top: 72px;
+}
+
 .league-tabs {
     display: flex;
     gap: 24px;
