@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { getTeam, getMatchup, getTeamByID, getAvailablePlayers, getStandings } from '../api/league';
+import { getTeam, getMatchup, getTeamByID, getAvailablePlayers, getStandings, getPoints } from '../api/league';
 import './pages.css';
 
 const TABS = ['Team', 'Matchup', 'Waivers', 'Standings'];
@@ -68,6 +68,15 @@ function LeaguePage() {
                     getTeamByID(matchupData.home_team_id),
                     getTeamByID(matchupData.away_team_id),
                 ]);
+                if (cancelled) return;
+                for (const player of homeRosterData.players) {
+                    const points = await getPoints(leagueID, player.cfbd_id);
+                    player.points = points;
+                }
+                for (const player of awayRosterData.players) {
+                    const points = await getPoints(leagueID, player.cfbd_id);
+                    player.points = points;
+                }
                 if (cancelled) return;
                 setHomeRoster(homeRosterData.players);
                 setAwayRoster(awayRosterData.players);
@@ -157,7 +166,7 @@ function LeaguePage() {
                                         ).map(player => (
                                             <div className="league-roster-row" key={player.id}>
                                                 <span>{player.position}: {player.name}</span>
-                                                <span className="league-roster-school">{player.school}</span>
+                                                <span className="league-roster-school">{player.points.toFixed(2)}</span>
                                             </div>
                                         ))}
                                     </div>

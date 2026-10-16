@@ -85,3 +85,13 @@ export async function getStandings(leagueID) {
         a.name.localeCompare(b.name, 'en')
     );
 }
+
+export async function getPoints(leagueID, playerID) {
+    const response = await fetch(`${API_URL}/leagues/id/${leagueID}`);
+    const league = await response.json();
+    let week = league.current_week;
+    week += 5;
+    const points = await fetch(`${API_URL}/teams/${week}/${playerID}/score`);
+    const score = await points.json();
+    return score;
+}
