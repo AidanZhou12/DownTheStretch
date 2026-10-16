@@ -1,5 +1,6 @@
 from sqlalchemy import CheckConstraint, Column, String, ForeignKey, Table
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import JSONB
 from database import Base
 
 player_team_association = Table(
@@ -72,3 +73,13 @@ class Draft(Base):
     league: Mapped["League"] = relationship(back_populates="draft")
     current_pick: Mapped[int] = mapped_column(nullable=False, default=1)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+
+class Game(Base):
+    __tablename__ = "games"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cfbd_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    week: Mapped[int] = mapped_column(nullable=False)
+    home_team: Mapped[str] = mapped_column(String(100), nullable=False)
+    away_team: Mapped[str] = mapped_column(String(100), nullable=False)
+    boxscore: Mapped[list] = mapped_column(JSONB, nullable=False)
