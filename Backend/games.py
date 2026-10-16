@@ -24,6 +24,11 @@ for school in schools:
         if data == []:
             print(f"{school} had a bye week in week 6")
             continue
+        home_conference = data[0]["teams"][1]["conference"]
+        away_conference = data[0]["teams"][0]["conference"]
+        if home_conference not in conferences or away_conference not in conferences:
+            print(f"{school} did not play a power 4 team in week 6")
+            continue
         with SessionLocal() as session:
             statement = select(models.Game).where(models.Game.cfbd_id == data[0]["id"])
             existing_game = session.execute(statement).scalar_one_or_none()
