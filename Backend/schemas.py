@@ -8,9 +8,11 @@ class TeamCreate(TeamBase):
     password: str
     league_id: int
 
+class TeamLogin(TeamBase):
+    password: str
+
 class TeamResponse(TeamBase):
     id: int
-    password: str
     league_id: int
     draft_position: int
     players: list[RosterPlayerResponse] = []

@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
-import { getTeam, getCount, getDraftStatus } from '../api/login';
+import { loginTeam, getCount, getDraftStatus } from '../api/login';
 import { useNavigate } from 'react-router';
 import './pages.css';
 
@@ -19,10 +19,7 @@ function LoginPage() {
                     e.preventDefault();
                     setError('');
                     try {
-                        const team = await getTeam(teamName);
-                        if (team.password !== password) {
-                            throw new Error('Incorrect password');
-                        }
+                        const team = await loginTeam(teamName, password);
                         const teamCount = await getCount(team.league_id);
                         const draftStatus = await getDraftStatus(team.league_id);
                         if (draftStatus === 'completed') {

@@ -1,11 +1,17 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-export async function getTeam(teamName) {
-    const response = await fetch(`${API_URL}/teams/${teamName}`);
+export async function loginTeam(teamName, password) {
+    const response = await fetch(`${API_URL}/teams/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: teamName, password }),
+    });
     if (!response.ok) {
-        throw new Error('Failed to fetch team');
+        throw new Error(response.status === 401
+            ? 'Invalid team name or password'
+            : 'Failed to log in');
     }
-    return await response.json();
+    return response.json();
 }
 
 export async function getCount(leagueID) {
