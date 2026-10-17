@@ -4,7 +4,9 @@ from sqlalchemy import select
 from database import get_db
 import models
 from typing import Annotated
-from schemas import TeamCreate, TeamBase, TeamResponse, MatchupResponse
+from schemas import TeamCreate, TeamLogin, TeamResponse, MatchupResponse
+
+from security import hash_password, verify_password
 
 router = APIRouter()
 
@@ -22,7 +24,7 @@ def create_team(team: TeamCreate, db: Annotated[Session, Depends(get_db)]):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Team with this name already exists")
     new_team = models.Team(
         name=team.name,
-        password=team.password,
+        password_hash=hash_password(team.password),
         league_id=team.league_id,
         draft_position=draft_position
     )
@@ -30,6 +32,13 @@ def create_team(team: TeamCreate, db: Annotated[Session, Depends(get_db)]):
     db.commit()
     db.refresh(new_team)
     return new_team
+
+@router.post("/login", response_model=TeamResponse)
+def login_team(credentials: TeamLogin, db: Annotated[Session, Depends(get_db)]):
+    team = db.execute(select(models.Team).where(models.Team.name == credentials.name)).scalar_one_or_none()
+    if team is None or not verify_password(credentials.password, team.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid team name or password")
+    return team
 
 @router.get("/{name}", response_model=TeamResponse)
 def get_team(name: str, db: Annotated[Session, Depends(get_db)]):
